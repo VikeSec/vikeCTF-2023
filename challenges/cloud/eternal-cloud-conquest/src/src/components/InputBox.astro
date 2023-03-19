@@ -1,0 +1,29 @@
+---
+export interface Props {
+  fieldName: string;
+  inputName: string;
+  type?: string;
+  placeholder?: string;
+  error?: string;
+}
+---
+
+<div class="mb-4">
+  <label
+    class="mb-2 block text-sm font-bold text-white"
+    for={Astro.props.inputName}
+  >
+    {Astro.props.fieldName}
+  </label>
+  <input
+    class="focus:shadow-outline w-full appearance-none rounded border bg-gray-300 py-2 px-3 leading-tight text-gray-700 shadow focus:outline-none"
+    name={Astro.props.inputName}
+    type={Astro.props.type ? Astro.props.type : "text"}
+    placeholder={Astro.props.placeholder}
+  />
+  {
+    Astro.props.error && (
+      <p class="text-xs italic text-red-500">{Astro.props.error}</p>
+    )
+  }
+</div>

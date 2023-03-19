@@ -1,0 +1,83 @@
+---
+import Layout from "@layouts/Layout.astro";
+
+import InputBox from "@components/InputBox.astro";
+import Button from "@components/Button.astro";
+import Form from "@components/Form.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { SITE } from "@config";
+import { createSession, UserData } from "@utils/auth";
+
+const errors = { username: "", img: "", password: "" };
+
+if (Astro.cookies.has("Authorization")) return Astro.redirect("/profile");
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const name = data.get("username");
+    const password = data.get("password");
+
+    if (typeof name !== "string" || name.length < 1) {
+      errors.username = "Please enter a username";
+    }
+
+    if (typeof password !== "string" || password.length < 6) {
+      errors.password = "Please enter a password over length 6";
+    }
+
+    const user_data: UserData = {
+      username: name!.toString(),
+      birthday: "",
+      mothers_maiden_name: "",
+      img: "",
+      city: "",
+      iat: 0,
+    };
+
+    if (Object.values(errors).every(x => x === "")) {
+      let token = await createSession(user_data);
+      Astro.cookies.set("Authorization", `Bearer ${token}`);
+      return Astro.redirect("/profile");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout title={`Register | ${SITE.title}`}>
+  <Header />
+
+  <main id="main-content">
+    <div
+      class="m-auto my-48 flex max-w-sm flex-col items-center justify-center rounded-lg bg-zinc-700 shadow-md"
+    >
+      <h1 class="text-2xl font-bold text-white">Register now!</h1>
+      <Form>
+        <InputBox
+          fieldName="Username"
+          inputName="username"
+          error={errors.username}
+        />
+        <InputBox
+          fieldName="Password"
+          inputName="password"
+          error={errors.password}
+          type="password"
+        />
+
+        <div class="flex items-center justify-between">
+          <Button text="Sign in" />
+          <div class="w-4"></div>
+          <Button text="Forgot Password" onclick="alert('Todo!');" />
+        </div>
+      </Form>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

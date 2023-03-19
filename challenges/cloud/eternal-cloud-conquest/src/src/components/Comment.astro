@@ -1,0 +1,43 @@
+---
+export interface Props {
+  author: string;
+  img: string;
+  commentBody: string;
+}
+
+import { ERROR_IMAGE } from "@utils/constants";
+
+const TIMEOUT = 500;
+
+const { author, img, commentBody } = Astro.props;
+
+let stringified = "";
+
+try {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), TIMEOUT);
+  // let mili = new Date().getMilliseconds();
+  let buffer = await (
+    await fetch(img.trim(), { signal: controller.signal })
+  ).arrayBuffer();
+  // console.log(new Date().getMilliseconds() - mili);
+
+  clearTimeout(id);
+  stringified = Buffer.from(buffer)!.toString("base64");
+} catch (error) {
+  console.log(error);
+  stringified = ERROR_IMAGE;
+}
+
+const b64_image = `data:image/png;base64,${stringified}`;
+---
+
+<div class="my-6 flex">
+  <div class="w-24 flex-none">
+    <div class="flex flex-col">
+      <img class="h-8 object-scale-down object-center" src={b64_image} />
+      <div class="text-center">{author}</div>
+    </div>
+  </div>
+  <div class="flex-initial">{commentBody}</div>
+</div>

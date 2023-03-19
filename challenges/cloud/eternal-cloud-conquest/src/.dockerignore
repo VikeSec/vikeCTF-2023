@@ -1,0 +1,8 @@
+*
+!src
+!package*.json
+!astro.config.mjs
+!tailwind.config.cjs
+!tsconfig.json
+!supervisord.conf
+!ec2mock.json

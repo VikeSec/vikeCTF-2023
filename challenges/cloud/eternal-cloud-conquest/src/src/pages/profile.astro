@@ -1,0 +1,82 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { SITE } from "@config";
+import { createSession, authorizeUser, UserData } from "@utils/auth";
+import Form from "@components/Form.astro";
+import Button from "@components/Button.astro";
+import InputBox from "@components/InputBox.astro";
+
+const user_data = await authorizeUser(Astro.cookies.get("Authorization").value);
+if (!user_data) {
+  Astro.cookies.delete("Authorization");
+  return Astro.redirect("/register");
+}
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+
+    const new_user_data: UserData = {
+      username: user_data.username,
+      birthday: data.get("birthday")!.toString() || user_data.birthday,
+      mothers_maiden_name:
+        data.get("mothers_maiden_name")!.toString() ||
+        user_data.mothers_maiden_name,
+      img: data.get("img")!.toString() || user_data.img,
+      city: data.get("city")!.toString() || user_data.city,
+      iat: 0,
+    };
+
+    let token = await createSession(new_user_data);
+    Astro.cookies.set("Authorization", `Bearer ${token}`);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+  return Astro.redirect("/profile");
+}
+---
+
+<Layout title={`Profile | ${SITE.title}`}>
+  <Header />
+  <section id="hero">
+    <p class="text-4xl">Welcome {user_data.username}!</p>
+    <p>
+      AstroPaper is a minimal, responsive, accessible and SEO-friendly Astro
+      blog theme. This theme follows best practices and provides accessibility
+      out of the box. Light and dark mode are supported by default. Moreover,
+      additional color schemes can also be configured.
+    </p>
+    <p>Read the blog posts or check</p>
+  </section>
+  <div
+    class="min-w-7xl m-auto my-12 flex max-w-7xl flex-col items-center justify-center rounded-lg bg-zinc-700 shadow-md"
+  >
+    <Form>
+      <InputBox
+        placeholder={user_data.mothers_maiden_name}
+        fieldName="Mothers Maiden Name"
+        inputName="mothers_maiden_name"
+      />
+      <InputBox
+        placeholder={user_data.birthday}
+        fieldName="Your Birthday"
+        inputName="birthday"
+      />
+      <InputBox
+        placeholder={user_data.img}
+        fieldName="Profile Image URL"
+        inputName="img"
+      />
+      <InputBox
+        placeholder={user_data.city}
+        fieldName="The City you live in"
+        inputName="city"
+      />
+      <Button text="Update Details" />
+    </Form>
+  </div>
+  <Footer />
+</Layout>

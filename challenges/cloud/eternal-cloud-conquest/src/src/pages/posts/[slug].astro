@@ -1,0 +1,86 @@
+---
+import { CollectionEntry, getCollection, getEntryBySlug } from "astro:content";
+import Posts from "@layouts/Posts.astro";
+import PostDetails from "@layouts/PostDetails.astro";
+import getSortedPosts from "@utils/getSortedPosts";
+import getPageNumbers from "@utils/getPageNumbers";
+import { SITE } from "@config";
+import type { AllComments, Comments } from "@content/comments";
+import { authorizeUser } from "@utils/auth";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { slug } = Astro.params;
+let { post } = Astro.props;
+
+const posts = await getCollection("blog");
+const sortedPosts = getSortedPosts(posts);
+const totalPages = getPageNumbers(sortedPosts.length);
+
+const currentPage =
+  slug && !isNaN(Number(slug)) && totalPages.includes(Number(slug))
+    ? Number(slug)
+    : 0;
+
+const lastPost = currentPage * SITE.postPerPage;
+const startPost = lastPost - SITE.postPerPage;
+
+const paginatedPosts = sortedPosts.slice(startPost, lastPost);
+
+if (currentPage === 0) {
+  post = (await getEntryBySlug(
+    "blog",
+    slug as string
+  )) as CollectionEntry<"blog">;
+}
+
+const user_data = await authorizeUser(Astro.cookies.get("Authorization").value);
+
+if (Astro.request.method === "POST" && post && user_data) {
+  const form_data = await Astro.request.formData();
+  const new_comment_body = form_data.get("comment")!.toString();
+
+  if (!Astro.cookies.has("Comments")) {
+    Astro.cookies.set("Comments", {});
+  }
+
+  let all_user_comments: AllComments = {};
+
+  try {
+    all_user_comments = JSON.parse(Astro.cookies.get("Comments")!.value!);
+    const pagenum = +slug!.charAt(0);
+    console.log(pagenum);
+    const currentPageComments: Comments = all_user_comments[pagenum];
+    const new_comment: Comment = {
+      comment_content: new_comment_body,
+    };
+    if (!currentPageComments || currentPageComments.length === 0) {
+      all_user_comments[pagenum] = [new_comment];
+    } else {
+      all_user_comments[pagenum][currentPageComments.length] = new_comment;
+    }
+
+    console.log(all_user_comments);
+    Astro.cookies.set("Comments", JSON.stringify(all_user_comments));
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    Astro.cookies.delete("Comments");
+  }
+}
+---
+
+{
+  post ? (
+    <PostDetails post={post} />
+  ) : (
+    <Posts
+      posts={paginatedPosts}
+      pageNum={currentPage}
+      totalPages={totalPages.length}
+    />
+  )
+}

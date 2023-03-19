@@ -1,0 +1,30 @@
+{
+  "server": {
+    "hostname": "0.0.0.0"
+  },
+  "metadata": {
+    "values": {
+      "mac-public-hostname": "ec2-127-0-0-1.compute-1.amazonaws.com",
+      "mac-public-ipv4s": "127.0.0.1",
+      "mac-subnet-ipv4-cidr-block": "127.0.0.1/24",
+      "mac-vpc-ipv4-cidr-block": "127.0.0.1/24",
+      "mac-vpc-ipv4-cidr-blocks": "127.0.0.1/24",
+      "public-hostname": "ec2-127-0-0-1.compute-1.amazonaws.com",
+      "public-ipv4": "127.0.0.1",
+      "tags-instance-name": "metadata-instance",
+      "iam-info": {
+        "LastUpdated": "2023-03-17T16:00:00Z",
+        "InstanceProfileArn": "arn:aws:iam::896453262835:metadata-instance-profile/vikeCTF-metadata-role",
+        "InstanceProfileId": "AIPA5BOGHHXZELSK34VU4"
+      },
+      "iam-security-credentials-role": "vikeCTF-metadata-role",
+      "iam-security-credentials": {
+        "LastUpdated": "2023-03-17T16:00:00Z",
+        "AccessKeyId": "12345678901",
+        "SecretAccessKey": "v/12345678901",
+        "Token": "vikeCTF{d0nt_f0rg3t_@b0ut_n3tw0rk_@cc355}",
+        "Expiration": "2023-03-19T16:00:00Z"
+      }
+    }
+  }
+}

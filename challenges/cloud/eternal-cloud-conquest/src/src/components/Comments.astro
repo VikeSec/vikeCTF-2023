@@ -1,0 +1,65 @@
+---
+import Comment from "@components/Comment.astro";
+import { all_comments } from "@content/comments";
+import type { Comments, AllComments } from "@content/comments";
+import { authorizeUser } from "@utils/auth";
+import Form from "./Form.astro";
+import InputBox from "./InputBox.astro";
+import Button from "./Button.astro";
+
+export interface Props {
+  slug: string;
+}
+
+const slug_num = +Astro.props.slug!.at(0)!;
+
+const post_comments: Comments = all_comments[slug_num]!;
+// console.log(JSON.stringify(all_comments));
+// console.log(Astro.cookies.get("Comments").value);
+// console.log(JSON.parse(Astro.cookies.get("Comments").value!));
+// Astro.cookies.set("Comments", all_comments);
+let user_comments: Comments = [];
+
+const user_data = await authorizeUser(Astro.cookies.get("Authorization").value);
+if (user_data) {
+  try {
+    const all_user_comments: AllComments = JSON.parse(
+      Astro.cookies.get("Comments").value!
+    );
+    user_comments = all_user_comments[slug_num]!;
+  } catch (error) {}
+}
+---
+
+<div>
+  <div class="my-2 text-2xl">Comments</div>
+  {
+    post_comments &&
+      post_comments.map(comment => (
+        <Comment
+          author={comment.author}
+          img={comment.img}
+          commentBody={comment.comment_content}
+        />
+      ))
+  }
+  {
+    user_data &&
+      user_comments &&
+      user_comments.map(comment => (
+        <Comment
+          author={user_data.username}
+          img={user_data.img}
+          commentBody={comment.comment_content}
+        />
+      ))
+  }
+  {
+    user_data && (
+      <Form>
+        <InputBox fieldName="" inputName="comment" />
+        <Button text="New Comment" />
+      </Form>
+    )
+  }
+</div>
