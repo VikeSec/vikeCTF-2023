@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { loggedIn } from "./login";
+
+if (!loggedIn(Astro.cookies.get("token").value || "")) {
+    return Astro.redirect("/", 303);
+}
+---
+
+<Layout title="Login" background="/images/background.jpg">
+    <main>
+        <h1 class="text-white text-2xl" is:raw>vikeCTF{0n1y_7h3_w0r7hy_m@y_p@55}</h1>
+    </main>
+</Layout>

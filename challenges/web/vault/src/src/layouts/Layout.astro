@@ -1,0 +1,40 @@
+---
+export interface Props {
+	title: string;
+	background: string;
+}
+
+const { background, title } = Astro.props;
+const bg_style = "background-image:url('" + background + "')"
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<div
+			class="flex h-screen w-full items-center justify-center bg-gray-900 bg-cover bg-no-repeat"
+			style={bg_style}
+		>
+			<slot />
+		</div>
+	</body>
+</html>
+<style is:global>
+	:root {
+	}
+	html {
+		font-family: system-ui, sans-serif;
+		background-color: #f6f6f6;
+	}
+	code {
+		font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+			DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+	}
+</style>

@@ -1,0 +1,64 @@
+---
+---
+
+<script>
+    type response_body = { svg: string; remaining_captchas: number };
+
+    function checkCaptcha() {
+        let input = document.getElementById(
+            "captcha_input"
+        ) as HTMLInputElement;
+        let body = { solution: input.value };
+        input.value = "";
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/captcha");
+
+        xhr.setRequestHeader("Content-type", "application/json");
+
+        xhr.onload = () => {
+            let resp_body: response_body = JSON.parse(xhr.response);
+
+            let image_div = document.getElementById(
+                "captcha_image"
+            ) as HTMLDivElement;
+            image_div.innerHTML = resp_body.svg;
+
+            let count_p = document.getElementById(
+                "remaining_captchas"
+            ) as HTMLParagraphElement;
+            count_p.textContent =
+                "Solves remaining: " + resp_body.remaining_captchas;
+        };
+
+        xhr.send(JSON.stringify(body));
+    }
+
+    let submit_button = document.getElementById(
+        "submit_captcha"
+    ) as HTMLButtonElement;
+    submit_button.addEventListener("click", () => {
+        checkCaptcha();
+    });
+
+    checkCaptcha();
+</script>
+
+<div><p id="remaining_captchas">Solves remaining:</p></div>
+<div class="flex flex-row flex-nowrap justify-center w-min">
+    <div id="captcha_image" class="w-40 rounded-3xl bg-white"></div>
+    <div class="w-40 rounded-3xl overflow-hidden">
+        <input
+            id="captcha_input"
+            type="text"
+            class="w-full h-full border-none bg-blue-100 bg-opacity-50 px-6 py-2 text-center text-inherit placeholder-slate-200 shadow-lg outline-none backdrop-blur-md"
+        />
+    </div>
+</div>
+<div class="w-full">
+    <button
+        id="submit_captcha"
+        type="button"
+        class="w-full mt-4 rounded-3xl h-full bg-blue-100 bg-opacity-50 px-6 py-2 text-white shadow-xl backdrop-blur-md transition-colors duration-300 hover:bg-blue-400"
+        >Check captcha</button
+    >
+</div>
