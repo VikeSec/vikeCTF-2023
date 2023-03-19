@@ -1,0 +1,4 @@
+*
+!*.go
+!views
+!go.mod

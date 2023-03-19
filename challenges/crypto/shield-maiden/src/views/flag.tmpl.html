@@ -1,0 +1,18 @@
+<h2>Will it decrypt without errors?</h2>
+
+<form action="./submit" method="get">
+  <div>
+    <label for="ciphertext">Encrypted flag (base64)</label>
+    <input
+      required
+      type="ciphertext"
+      id="ciphertext"
+      name="ciphertext"
+      placeholder="ciphertext"
+      value="{{.}}"
+    />
+  </div>
+  <div>
+    <button>Submit</button>
+  </div>
+</form>
